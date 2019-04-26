@@ -63,21 +63,21 @@ namespace DaHo.SephirWatcher
 
         private static Dictionary<string, string> SephirAccountToDictionary(SephirAccount account)
         {
-            return new Dictionary<string, string>(new[]
+            return new Dictionary<string, string>
             {
-                new KeyValuePair<string, string>("email", account.AccountEmail),
-                new KeyValuePair<string, string>("passwort", account.AccountPassword)
-            });
+                {"email", account.AccountEmail},
+                { "passwort", account.AccountPassword}
+            };
         }
 
         private static Dictionary<string, string> GetDictionaryForMarks(string klasseId)
         {
-            return new Dictionary<string, string>(new[]
+            return new Dictionary<string, string>
             {
-                new KeyValuePair<string, string>("klasseId", klasseId),
-                new KeyValuePair<string, string>("klassefachId", "all"),
-                new KeyValuePair<string, string>("seltyp", "klasse")
-            });
+                { "klasseId", klasseId},
+                {"klassefachId", "all"},
+                {"seltyp", "klasse"}
+            };
         }
 
         private static IEnumerable<SephirExam> GetSephirExamsFromExamPage(string examPage)
@@ -93,7 +93,7 @@ namespace DaHo.SephirWatcher
                         .ChildNodes
                         .Where(y => y.Name.Equals("td"))
                         .Select(y => HttpUtility.HtmlDecode(y.InnerText)?.Trim())
-                        .ToList() 
+                        .ToList()
 
                 })
                 .ToList();
