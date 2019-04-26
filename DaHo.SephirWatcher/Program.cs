@@ -7,6 +7,7 @@ using DaHo.SephirWatcher.Extensions;
 using DaHo.SephirWatcher.Interfaces;
 using DaHo.SephirWatcher.Models;
 using HtmlAgilityPack;
+using HtmlAgilityPack.CssSelectors.NetCore;
 using RestEase;
 
 namespace DaHo.SephirWatcher
@@ -26,6 +27,12 @@ namespace DaHo.SephirWatcher
                 AccountPassword = "Error404!"
 
             }));
+
+            if (!WasLoginSuccessful(loggedIn))
+            {
+                await Console.Error.WriteLineAsync("Anmeldung war nicht erfolgreich. Bitte prüfe deine Daten.");
+                return;
+            }
 
             var marks = await api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks("12929"));
             var allExams = GetSephirExamsFromExamPage(marks).ToList();
@@ -103,6 +110,11 @@ namespace DaHo.SephirWatcher
                     SchoolSubject = row.Columns[1]
                 };
             }
+        }
+
+        private static bool WasLoginSuccessful(string loginPage)
+        {
+            return !loginPage.Contains("Anmeldung nicht erfolgreich");
         }
     }
 }
