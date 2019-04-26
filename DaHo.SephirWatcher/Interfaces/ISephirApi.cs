@@ -47,5 +47,10 @@ namespace DaHo.SephirWatcher.Interfaces
         /// <returns>The html code of the marks-page in sephir</returns>
         [Post("40_berufsfachschule/noten.cfm?nogroup=pruef")]
         Task<string> Marks([Query] string cfId, [Query] string cfToken, [Body(BodySerializationMethod.UrlEncoded)] IDictionary<string, string> requestInfo);
+
+
+
+        [Get("40_berufsfachschule/noten.cfm")]
+        Task<string> MarksOverview([Query] string cfId, [Query] string cfToken);
     }
 }

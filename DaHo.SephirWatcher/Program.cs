@@ -34,10 +34,15 @@ namespace DaHo.SephirWatcher
                 return;
             }
 
-            var marks = await api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks("12929"));
-            var allExams = GetSephirExamsFromExamPage(marks).ToList();
+            var classes = GetSchoolClassesFromMarksOverviewPage(await api.MarksOverview(tokens.CfId, tokens.CfToken)).ToList();
+            var allExams = new List<SephirExam>();
+            foreach (var schoolClass in classes)
+            {
+                var marks = await api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks(schoolClass.ClassId));
+                allExams.AddRange(GetSephirExamsFromExamPage(marks));
+            }
 
-            Console.WriteLine(marks);
+            Console.WriteLine(allExams.Count);
         }
 
         private static CfAuthentification GetCfAuthentificationFromIndexPage(string indexPage)
@@ -81,10 +86,7 @@ namespace DaHo.SephirWatcher
             doc.LoadHtml(examPage);
 
             var tableRows = doc
-                .QuerySelector("table.listtab_rot")
-                .ChildNodes
-                .Where(x => x.Name.Equals("tr"))
-                .Skip(1)
+                .QuerySelectorAll("table.listtab_rot > tr:not(:first-child)")
                 .Select(x => new
                 {
                     Columns = x
@@ -115,6 +117,23 @@ namespace DaHo.SephirWatcher
         private static bool WasLoginSuccessful(string loginPage)
         {
             return !loginPage.Contains("Anmeldung nicht erfolgreich");
+        }
+
+        private static IEnumerable<SchoolClass> GetSchoolClassesFromMarksOverviewPage(string page)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(page);
+
+            var classOptions = doc.QuerySelectorAll("select[name=klasseid] > option");
+
+            foreach (var classOption in classOptions)
+            {
+                yield return new SchoolClass
+                {
+                    ClassId = classOption.GetAttributeValue("value", string.Empty),
+                    ClassName = classOption.InnerText
+                };
+            }
         }
     }
 }

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaHo.SephirWatcher", "DaHo.SephirWatcher\DaHo.SephirWatcher.csproj", "{BC5FC7C8-4669-48AE-8D64-32E22210C734}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaHo.SephirWatcher", "DaHo.SephirWatcher\DaHo.SephirWatcher.csproj", "{BC5FC7C8-4669-48AE-8D64-32E22210C734}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaHo.SephirWatcher.Web", "DaHo.SephirWatcher.Web\DaHo.SephirWatcher.Web.csproj", "{9B230C7A-AD89-4A61-A248-60469D1387D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BC5FC7C8-4669-48AE-8D64-32E22210C734}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC5FC7C8-4669-48AE-8D64-32E22210C734}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC5FC7C8-4669-48AE-8D64-32E22210C734}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B230C7A-AD89-4A61-A248-60469D1387D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B230C7A-AD89-4A61-A248-60469D1387D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B230C7A-AD89-4A61-A248-60469D1387D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B230C7A-AD89-4A61-A248-60469D1387D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
