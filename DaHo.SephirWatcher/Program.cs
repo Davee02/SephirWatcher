@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using DaHo.SephirWatcher.Extensions;
@@ -19,14 +20,17 @@ namespace DaHo.SephirWatcher
             var indexPage = await api.Index();
             var tokens = GetCfAuthentificationFromIndexPage(indexPage);
 
-            var loggedIn = await api.Login(SephirAccountToDictionary(new SephirAccount
+            var loggedIn = await api.Login(tokens.CfId, tokens.CfToken, SephirAccountToDictionary(new SephirAccount
             {
                 AccountEmail = "david_hodel@sluz.ch",
-                AccountPassword = "Error404!" 
+                AccountPassword = "Error404!"
 
-            }), tokens.CfId, tokens.CfToken);
+            }));
 
-            Console.WriteLine(loggedIn);
+            var marks = await api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks("12929"));
+            var allExams = GetSephirExamsFromExamPage(marks).ToList();
+
+            Console.WriteLine(marks);
         }
 
         private static CfAuthentification GetCfAuthentificationFromIndexPage(string indexPage)
@@ -47,11 +51,58 @@ namespace DaHo.SephirWatcher
 
         private static Dictionary<string, string> SephirAccountToDictionary(SephirAccount account)
         {
-            return new Dictionary<string, string>(new []
+            return new Dictionary<string, string>(new[]
             {
                 new KeyValuePair<string, string>("email", account.AccountEmail),
                 new KeyValuePair<string, string>("passwort", account.AccountPassword)
             });
+        }
+
+        private static Dictionary<string, string> GetDictionaryForMarks(string klasseId)
+        {
+            return new Dictionary<string, string>(new[]
+            {
+                new KeyValuePair<string, string>("klasseId", klasseId),
+                new KeyValuePair<string, string>("klassefachId", "all"),
+                new KeyValuePair<string, string>("seltyp", "klasse")
+            });
+        }
+
+        private static IEnumerable<SephirExam> GetSephirExamsFromExamPage(string examPage)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(examPage);
+
+            var tableRows = doc
+                .QuerySelector("table.listtab_rot")
+                .ChildNodes
+                .Where(x => x.Name.Equals("tr"))
+                .Skip(1)
+                .Select(x => new
+                {
+                    Columns = x
+                        .ChildNodes
+                        .Where(y => y.Name.Equals("td"))
+                        .Select(y => HttpUtility.HtmlDecode(y.InnerText)?.Trim())
+                        .ToList() 
+
+                })
+                .ToList();
+
+
+            foreach (var row in tableRows)
+            {
+                yield return new SephirExam
+                {
+                    ExamDate = DateTime.Parse(row.Columns[0]),
+                    ExamState = row.Columns[3],
+                    ExamTitle = row.Columns[2],
+                    MarkType = row.Columns[4],
+                    MarkWeighting = row.Columns[5].ParseOrNaN(),
+                    Mark = row.Columns[6].ParseOrNaN(),
+                    SchoolSubject = row.Columns[1]
+                };
+            }
         }
     }
 }
