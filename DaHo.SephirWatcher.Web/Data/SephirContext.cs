@@ -9,9 +9,11 @@ namespace DaHo.SephirWatcher.Web.Data
         public SephirContext(DbContextOptions<SephirContext> options)
             : base(options)
         {
-
+            
         }
 
         public DbSet<SephirLogin> SephirLogins { get; set; }
+
+        public DbSet<SephirTest> SephirTests { get; set; }
     }
 }

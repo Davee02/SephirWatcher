@@ -2,11 +2,15 @@
 {
     public static class NumberExtensions
     {
-        public static double ParseOrNaN(this string s)
+        public static double? ParseOrNull(this string s)
         {
-            return double.TryParse(s, out var result) 
-                ? result 
-                : double.NaN;
+            if (double.TryParse(s, out var result))
+            {
+                return result;
+            }
+
+            return null;
+
         }
     }
 }

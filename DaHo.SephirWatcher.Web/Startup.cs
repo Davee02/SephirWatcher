@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace DaHo.SephirWatcher.Web
 {
@@ -40,8 +42,9 @@ namespace DaHo.SephirWatcher.Web
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IEmailSender, EmailSender>();
-
             services.AddTransient<IPasswordCipher, PasswordCipher>();
+
+            services.AddSingleton<IHostedService, SephirMarkWatcherService>();
 
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)

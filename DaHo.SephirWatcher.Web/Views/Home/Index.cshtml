@@ -1,8 +1,33 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SephirLoginViewModel
+@{
+    ViewData["Title"] = "Start";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    
+    <h1 class="display-4">Willkommen beim Sephir-Watcher</h1>
 </div>
+
+<hr />
+
+<form asp-controller="Home" asp-action="SaveSephirLogin">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="EmailAdress" class="control-label"></label>
+        <input asp-for="EmailAdress" class="form-control" />
+        <span asp-validation-for="EmailAdress" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Daten überprüfen & speichern" class="btn btn-primary" />
+    </div>
+</form>
+
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

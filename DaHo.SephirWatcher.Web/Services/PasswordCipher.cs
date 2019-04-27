@@ -20,12 +20,18 @@ namespace DaHo.SephirWatcher.Web.Services
 
         public string Encrypt(string text)
         {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
             var protector = _dataProtectionProvider.CreateProtector(Options.EncryptionKey);
             return protector.Protect(text);
         }
 
-        public string Dencrypt(string text)
+        public string Decrypt(string text)
         {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
             var protector = _dataProtectionProvider.CreateProtector(Options.EncryptionKey);
             return protector.Unprotect(text);
         }

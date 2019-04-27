@@ -12,39 +12,65 @@ using RestEase;
 
 namespace DaHo.SephirWatcher
 {
-    internal class Program
+    public class SephirWatcher
     {
-        private static async Task Main(string[] args)
+        private readonly SephirAccount _account;
+        private readonly ISephirApi _api;
+        private CfAuthentification _tokens;
+        private bool _isLoggedIn;
+
+        public SephirWatcher(SephirAccount account)
         {
-            var api = RestClient.For<ISephirApi>("https://sephir.ch/ICT/user/lernendenportal");
+            _account = account;
+            _api = RestClient.For<ISephirApi>("https://sephir.ch/ICT/user/lernendenportal");
+        }
 
-            var indexPage = await api.Index();
-            var tokens = GetCfAuthentificationFromIndexPage(indexPage);
+        public async Task<bool> AreCredentialsValid()
+        {
+            if (_isLoggedIn)
+                return true;
 
-            var loggedIn = await api.Login(tokens.CfId, tokens.CfToken, SephirAccountToDictionary(new SephirAccount
+            var tokens = await GetTokensAsync();
+            var loginResult = await _api.Login(tokens.CfId, tokens.CfToken, SephirAccountToDictionary(_account));
+
+            _isLoggedIn = true;
+
+            return WasLoginSuccessful(loginResult);
+        }
+
+        public async Task<IList<SephirExam>> GetSephirExamsForAllClasses()
+        {
+            if (!_isLoggedIn && !await AreCredentialsValid())
             {
-                AccountEmail = "david_hodel@sluz.ch",
-                AccountPassword = "Error404!"
-
-            }));
-
-            if (!WasLoginSuccessful(loggedIn))
-            {
-                await Console.Error.WriteLineAsync("Anmeldung war nicht erfolgreich. Bitte prüfe deine Daten.");
-                return;
+                throw new Exception("Could not log in to Sephir");
             }
 
-            var classes = GetSchoolClassesFromMarksOverviewPage(await api.MarksOverview(tokens.CfId, tokens.CfToken)).ToList();
+            _isLoggedIn = true;
+            var tokens = await GetTokensAsync();
+
+            var classes = GetSchoolClassesFromMarksOverviewPage(await _api.MarksOverview(tokens.CfId, tokens.CfToken)).ToList();
             var allExams = new List<SephirExam>();
             foreach (var schoolClass in classes)
             {
-                var marks = await api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks(schoolClass.ClassId));
+                var marks = await _api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks(schoolClass.ClassId));
                 allExams.AddRange(GetSephirExamsFromExamPage(marks));
             }
 
-            Console.WriteLine(allExams.Count);
+            return allExams;
         }
 
+        private async Task<CfAuthentification> GetTokensAsync()
+        {
+            if (_tokens == null)
+            {
+                var indexPage = await _api.Index();
+                _tokens = GetCfAuthentificationFromIndexPage(indexPage);
+            }
+
+            return _tokens;
+        }
+
+        
         private static CfAuthentification GetCfAuthentificationFromIndexPage(string indexPage)
         {
             var doc = new HtmlDocument();
@@ -74,9 +100,9 @@ namespace DaHo.SephirWatcher
         {
             return new Dictionary<string, string>
             {
-                { "klasseId", klasseId},
-                {"klassefachId", "all"},
-                {"seltyp", "klasse"}
+                { "klasseId", klasseId },
+                { "klassefachId", "all" },
+                { "seltyp", "klasse" }
             };
         }
 
@@ -107,8 +133,8 @@ namespace DaHo.SephirWatcher
                     ExamState = row.Columns[3],
                     ExamTitle = row.Columns[2],
                     MarkType = row.Columns[4],
-                    MarkWeighting = row.Columns[5].ParseOrNaN(),
-                    Mark = row.Columns[6].ParseOrNaN(),
+                    MarkWeighting = row.Columns[5].ParseOrNull(),
+                    Mark = row.Columns[6].ParseOrNull(),
                     SchoolSubject = row.Columns[1]
                 };
             }

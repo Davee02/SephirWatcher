@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace DaHo.SephirWatcher.Web.Models
 {
@@ -13,12 +14,13 @@ namespace DaHo.SephirWatcher.Web.Models
         [Required]
         public string EmailAdress { get; set; }
 
-        [Required]
-        [NotMapped]
-        public string PlainPassword { get; set; }
 
-        [JsonIgnore]
         [Required]
         public string EncryptedPassword { get; set; }
+
+        public IdentityUser IdentityUser { get; set; }
+
+        [Required]
+        public string IdentityUserId { get; set; }
     }
 }

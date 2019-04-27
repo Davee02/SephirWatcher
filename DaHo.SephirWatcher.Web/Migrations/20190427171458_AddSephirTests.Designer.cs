@@ -4,14 +4,16 @@ using DaHo.SephirWatcher.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DaHo.SephirWatcher.Web.Migrations
 {
     [DbContext(typeof(SephirContext))]
-    partial class SephirContextModelSnapshot : ModelSnapshot
+    [Migration("20190427171458_AddSephirTests")]
+    partial class AddSephirTests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,12 +33,7 @@ namespace DaHo.SephirWatcher.Web.Migrations
                     b.Property<string>("EncryptedPassword")
                         .IsRequired();
 
-                    b.Property<string>("IdentityUserId")
-                        .IsRequired();
-
                     b.HasKey("Id");
-
-                    b.HasIndex("IdentityUserId");
 
                     b.ToTable("SephirLogins");
                 });
@@ -55,21 +52,17 @@ namespace DaHo.SephirWatcher.Web.Migrations
                     b.Property<string>("ExamTitle")
                         .IsRequired();
 
-                    b.Property<double?>("Mark");
+                    b.Property<double>("Mark");
 
                     b.Property<string>("MarkType")
                         .IsRequired();
 
-                    b.Property<double?>("MarkWeighting");
+                    b.Property<double>("MarkWeighting");
 
                     b.Property<string>("SchoolSubject")
                         .IsRequired();
 
-                    b.Property<long>("SephirLoginId");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("SephirLoginId");
 
                     b.ToTable("SephirTests");
                 });
@@ -237,22 +230,6 @@ namespace DaHo.SephirWatcher.Web.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("DaHo.SephirWatcher.Web.Models.SephirLogin", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
-                        .WithMany()
-                        .HasForeignKey("IdentityUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("DaHo.SephirWatcher.Web.Models.SephirTest", b =>
-                {
-                    b.HasOne("DaHo.SephirWatcher.Web.Models.SephirLogin", "SephirLogin")
-                        .WithMany()
-                        .HasForeignKey("SephirLoginId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
