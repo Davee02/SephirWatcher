@@ -1,9 +1,13 @@
-﻿using DaHo.SephirWatcher.Web.Data;
+﻿using DaHo.SephirWatcher.Web.Configuration;
+using DaHo.SephirWatcher.Web.Data;
+using DaHo.SephirWatcher.Web.Interfaces;
+using DaHo.SephirWatcher.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,9 +39,18 @@ namespace DaHo.SephirWatcher.Web
             services.AddDbContext<SephirContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddTransient<IPasswordCipher, PasswordCipher>();
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<SephirContext>();
+
+            services.Configure<EmailSenderOptions>(Configuration);
+            services.Configure<PasswordCipherOptions>(Configuration);
+
+            services.AddDataProtection();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

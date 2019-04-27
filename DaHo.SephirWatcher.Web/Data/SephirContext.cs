@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using DaHo.SephirWatcher.Web.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DaHo.SephirWatcher.Web.Data
@@ -10,5 +11,7 @@ namespace DaHo.SephirWatcher.Web.Data
         {
 
         }
+
+        public DbSet<SephirLogin> SephirLogins { get; set; }
     }
 }
