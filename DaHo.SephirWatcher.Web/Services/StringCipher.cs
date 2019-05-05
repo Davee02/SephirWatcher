@@ -5,11 +5,11 @@ using Microsoft.Extensions.Options;
 
 namespace DaHo.SephirWatcher.Web.Services
 {
-    public class PasswordCipher : IPasswordCipher
+    public class StringCipher : IStringCipher
     {
         private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public PasswordCipher(IOptions<PasswordCipherOptions> optionsAccessor, IDataProtectionProvider dataProtectionProvider)
+        public StringCipher(IOptions<PasswordCipherOptions> optionsAccessor, IDataProtectionProvider dataProtectionProvider)
         {
             _dataProtectionProvider = dataProtectionProvider;
             Options = optionsAccessor.Value;

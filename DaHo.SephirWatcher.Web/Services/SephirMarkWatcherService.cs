@@ -101,39 +101,61 @@ namespace DaHo.SephirWatcher.Web.Services
         private async Task ExecuteActionAsync(SephirLogin login, IServiceScope scope, CancellationToken cancellationToken)
         {
             var context = scope.ServiceProvider.GetRequiredService<SephirContext>();
-            var cipher = scope.ServiceProvider.GetRequiredService<IPasswordCipher>();
+            var cipher = scope.ServiceProvider.GetRequiredService<IStringCipher>();
             var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
+
+            var existingTests = await GetSavedTestsForLogin(login, cancellationToken, context);
+            var testsInSephir = await GetTestsInSephirForLogin(login, cipher);
+
+            var newTests = testsInSephir.Except(existingTests, new SephirTestWithoutIdsComparer()).ToList();
+
+            if (newTests.Any())
+            {
+                await HandleNewTestsInSephir(login, cancellationToken, context, newTests, emailSender);
+            }
+        }
+
+        private static async Task HandleNewTestsInSephir(SephirLogin login, CancellationToken cancellationToken,
+            SephirContext context, List<SephirTest> newTests, IEmailSender emailSender)
+        {
+            await context.SephirTests.AddRangeAsync(newTests, cancellationToken);
+            await context.SaveChangesAsync(cancellationToken);
+
+            await emailSender.SendEmailAsync(login.IdentityUser.Email, "Neue Note im Sephir",
+                "Du hast eine neue Note im Sephir!");
+        }
+
+        private static async Task<List<SephirTest>> GetSavedTestsForLogin(SephirLogin login, CancellationToken cancellationToken,
+            SephirContext context)
+        {
+            var existingTests = await context
+                .SephirTests
+                .Where(x => x.SephirLogin.Id == login.Id)
+                .ToListAsync(cancellationToken);
+            return existingTests;
+        }
+
+        private static async Task<IEnumerable<SephirTest>> GetTestsInSephirForLogin(SephirLogin login, IStringCipher cipher)
+        {
             var sephirWatcher = new SephirWatcher(new SephirAccount
             {
                 AccountEmail = login.EmailAdress,
                 AccountPassword = cipher.Decrypt(login.EncryptedPassword)
             });
 
-            var existingTests = await context
-                .SephirTests
-                .Where(x => x.SephirLogin.Id == login.Id)
-                .ToListAsync(cancellationToken);
-            var testsInSephir = (await sephirWatcher.GetSephirExamsForAllClasses())
-                                .Select(x => new SephirTest
-                                {
-                                    ExamDate = x.ExamDate,
-                                    ExamState = x.ExamState,
-                                    ExamTitle = x.ExamTitle,
-                                    Mark = x.Mark,
-                                    MarkType = x.MarkType,
-                                    MarkWeighting = x.MarkWeighting,
-                                    SchoolSubject = x.SchoolSubject,
-                                    SephirLoginId = login.Id
-                                });
-
-            var newTests = testsInSephir.Except(existingTests, new SephirTestWithoutIdsComparer()).ToList();
-            if (newTests.Any())
-            {
-                await context.SephirTests.AddRangeAsync(newTests, cancellationToken);
-                await context.SaveChangesAsync(cancellationToken);
-
-                await emailSender.SendEmailAsync(login.IdentityUser.Email, "Neue Note im Sephir", "Du hast eine neue Note im Sephir!");
-            }
+            return (await sephirWatcher.GetSephirExamsForAllClasses())
+                .Where(x => x.Mark.HasValue)
+                .Select(x => new SephirTest
+                {
+                    ExamDate = x.ExamDate,
+                    ExamState = x.ExamState,
+                    ExamTitle = x.ExamTitle,
+                    Mark = x.Mark,
+                    MarkType = x.MarkType,
+                    MarkWeighting = x.MarkWeighting,
+                    SchoolSubject = x.SchoolSubject,
+                    SephirLoginId = login.Id
+                });
         }
     }
 }

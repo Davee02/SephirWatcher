@@ -1,12 +1,11 @@
 ﻿@model SephirLoginViewModel
 @{
-    ViewData["Title"] = "Start";
+    ViewData["Title"] = "New Sephir account";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Willkommen beim Sephir-Watcher</h1>
+    <h1 class="display-4">Welcome to the Sephir-Watcher</h1>
 </div>
-
 <hr />
 
 <form asp-controller="Home" asp-action="SaveSephirLogin">
@@ -22,7 +21,7 @@
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <input type="submit" value="Daten überprüfen & speichern" class="btn btn-primary" />
+        <input type="submit" value="Check & save data" class="btn btn-primary" />
     </div>
 </form>
 

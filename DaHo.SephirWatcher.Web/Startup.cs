@@ -42,7 +42,7 @@ namespace DaHo.SephirWatcher.Web
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IEmailSender, EmailSender>();
-            services.AddTransient<IPasswordCipher, PasswordCipher>();
+            services.AddTransient<IStringCipher, StringCipher>();
 
             services.AddSingleton<IHostedService, SephirMarkWatcherService>();
 

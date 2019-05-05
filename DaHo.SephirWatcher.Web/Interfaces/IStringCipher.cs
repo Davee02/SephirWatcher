@@ -1,6 +1,6 @@
 ﻿namespace DaHo.SephirWatcher.Web.Interfaces
 {
-    public interface IPasswordCipher
+    public interface IStringCipher
     {
         string Encrypt(string text);
 
