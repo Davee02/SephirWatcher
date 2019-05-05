@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using RestEase;
 
-namespace DaHo.SephirWatcher.Interfaces
+namespace DaHo.SephirWatcher.Api
 {
     /// <summary>
     /// Provides endpoints for the sephir-webpage

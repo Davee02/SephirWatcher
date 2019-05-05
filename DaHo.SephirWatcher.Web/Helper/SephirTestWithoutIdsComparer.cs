@@ -7,8 +7,10 @@ namespace DaHo.SephirWatcher.Web.Helper
     {
         public bool Equals(SephirTest x, SephirTest y)
         {
-            if (ReferenceEquals(null, x) || ReferenceEquals(null, y)) return false;
-            if (ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(null, x) || ReferenceEquals(null, y))
+                return false;
+            if (ReferenceEquals(x, y))
+                return true;
 
             return x.ExamDate.Equals(y.ExamDate) && 
                    string.Equals(x.SchoolSubject, y.SchoolSubject) &&

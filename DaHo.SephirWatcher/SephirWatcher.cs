@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using DaHo.SephirWatcher.Extensions;
-using DaHo.SephirWatcher.Interfaces;
+using DaHo.SephirWatcher.Api;
 using DaHo.SephirWatcher.Models;
 using HtmlAgilityPack;
 using HtmlAgilityPack.CssSelectors.NetCore;
@@ -91,8 +91,8 @@ namespace DaHo.SephirWatcher
         {
             return new Dictionary<string, string>
             {
-                {"email", account.AccountEmail},
-                { "passwort", account.AccountPassword}
+                { "email", account.AccountEmail },
+                { "passwort", account.AccountPassword }
             };
         }
 

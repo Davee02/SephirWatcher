@@ -12,19 +12,26 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace DaHo.SephirWatcher.Web.Services
 {
     public class SephirMarkWatcherService : IHostedService, IDisposable
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-
-        private Task _executingTask;
+        private readonly ILogger<SephirMarkWatcherService> _logger;
+        private readonly IEmailSender _emailSender;
+        private readonly IStringCipher _stringCipher;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
 
-        public SephirMarkWatcherService(IServiceScopeFactory serviceScopeFactory)
+        private Task _executingTask;
+
+        public SephirMarkWatcherService(IServiceScopeFactory serviceScopeFactory, ILogger<SephirMarkWatcherService> logger, IEmailSender emailSender, IStringCipher stringCipher)
         {
             _serviceScopeFactory = serviceScopeFactory;
+            _logger = logger;
+            _emailSender = emailSender;
+            _stringCipher = stringCipher;
         }
 
         protected async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,27 +39,38 @@ namespace DaHo.SephirWatcher.Web.Services
             // This will cause the loop to stop if the service is stopped
             while (!stoppingToken.IsCancellationRequested)
             {
-                using (var scope = _serviceScopeFactory.CreateScope())
+                _logger.LogInformation($"Starting the watcher service at {DateTime.Now}");
+                try
                 {
-                    var context = scope.ServiceProvider.GetRequiredService<SephirContext>();
-
-                    var allSephirLogins = await context
-                        .SephirLogins
-                        .Include(x => x.IdentityUser)
-                        .ToListAsync(stoppingToken);
-                    var tasks = new List<Task>();
-
-                    foreach (var sephirLogin in allSephirLogins)
+                    using (var scope = _serviceScopeFactory.CreateScope())
                     {
-                        tasks.Add(ExecuteActionAsync(sephirLogin, scope, stoppingToken));
+                        var context = scope.ServiceProvider.GetRequiredService<SephirContext>();
+
+                        var allSephirLogins = await context
+                            .SephirLogins
+                            .Include(x => x.IdentityUser)
+                            .ToListAsync(stoppingToken);
+                        _logger.LogInformation($"Watching {allSephirLogins.Count} sephir accounts");
+
+                        var tasks = new List<Task>();
+                        foreach (var sephirLogin in allSephirLogins)
+                        {
+                            tasks.Add(ExecuteActionAsync(sephirLogin, scope, stoppingToken));
+                        }
+
+                        Task.WaitAll(tasks.ToArray(), stoppingToken);
                     }
-
-                    Task.WaitAll(tasks.ToArray(), stoppingToken);
-
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "An exception occured while running the watcher-service");
+                }
+                finally
+                {
                     // Wait 10 minutes before running again.
                     await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
                 }
-                 
+
             }
         }
 
@@ -100,29 +118,44 @@ namespace DaHo.SephirWatcher.Web.Services
 
         private async Task ExecuteActionAsync(SephirLogin login, IServiceScope scope, CancellationToken cancellationToken)
         {
+            var sephirWatcher = new SephirWatcher(new SephirAccount
+            {
+                AccountEmail = login.EmailAdress,
+                AccountPassword = _stringCipher.Decrypt(login.EncryptedPassword)
+            });
+
+            if (!await sephirWatcher.AreCredentialsValid())
+            {
+                await HandleInvalidSephirCredentials(login);
+            }
+
             var context = scope.ServiceProvider.GetRequiredService<SephirContext>();
-            var cipher = scope.ServiceProvider.GetRequiredService<IStringCipher>();
-            var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
 
             var existingTests = await GetSavedTestsForLogin(login, cancellationToken, context);
-            var testsInSephir = await GetTestsInSephirForLogin(login, cipher);
 
+            var testsInSephir = await GetTestsInSephirForLogin(login, sephirWatcher);
             var newTests = testsInSephir.Except(existingTests, new SephirTestWithoutIdsComparer()).ToList();
 
             if (newTests.Any())
             {
-                await HandleNewTestsInSephir(login, cancellationToken, context, newTests, emailSender);
+                await HandleNewTestsInSephir(login, cancellationToken, context, newTests);
             }
         }
 
-        private static async Task HandleNewTestsInSephir(SephirLogin login, CancellationToken cancellationToken,
-            SephirContext context, List<SephirTest> newTests, IEmailSender emailSender)
+        private async Task HandleNewTestsInSephir(SephirLogin login, CancellationToken cancellationToken,
+            SephirContext context, List<SephirTest> newTests)
         {
             await context.SephirTests.AddRangeAsync(newTests, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
-            await emailSender.SendEmailAsync(login.IdentityUser.Email, "Neue Note im Sephir",
+            await _emailSender.SendEmailAsync(login.IdentityUser.Email, "Neue Note im Sephir",
                 "Du hast eine neue Note im Sephir!");
+        }
+
+        private async Task HandleInvalidSephirCredentials(SephirLogin login)
+        {
+            await _emailSender.SendEmailAsync(login.IdentityUser.Email, "Ungültige Account-Daten",
+                "Der SephirWatcher kann sich nicht mehr mit deinem Sephir-Account einloggen. Bitte passe deine Daten auf unserer Webseite an.");
         }
 
         private static async Task<List<SephirTest>> GetSavedTestsForLogin(SephirLogin login, CancellationToken cancellationToken,
@@ -135,15 +168,9 @@ namespace DaHo.SephirWatcher.Web.Services
             return existingTests;
         }
 
-        private static async Task<IEnumerable<SephirTest>> GetTestsInSephirForLogin(SephirLogin login, IStringCipher cipher)
+        private async Task<IEnumerable<SephirTest>> GetTestsInSephirForLogin(SephirLogin login, SephirWatcher watcher)
         {
-            var sephirWatcher = new SephirWatcher(new SephirAccount
-            {
-                AccountEmail = login.EmailAdress,
-                AccountPassword = cipher.Decrypt(login.EncryptedPassword)
-            });
-
-            return (await sephirWatcher.GetSephirExamsForAllClasses())
+            return (await watcher.GetSephirExamsForAllClasses())
                 .Where(x => x.Mark.HasValue)
                 .Select(x => new SephirTest
                 {

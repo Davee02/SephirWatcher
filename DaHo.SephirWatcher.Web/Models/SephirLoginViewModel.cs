@@ -5,10 +5,12 @@ namespace DaHo.SephirWatcher.Web.Models
 {
     public class SephirLoginViewModel
     {
+        [Required]
+        [EmailAddress]
         [DisplayName("Email address")]
         public string EmailAdress { get; set; }
 
-        [Required(ErrorMessage = "Bitte gib das Passwort an")]
+        [Required]
         [DataType(DataType.Password)]
         [DisplayName("Password")]
         public string Password { get; set; }

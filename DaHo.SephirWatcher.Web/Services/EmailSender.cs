@@ -28,7 +28,6 @@ namespace DaHo.SephirWatcher.Web.Services
             {
                 From = new EmailAddress("noreply@sephirwatcher.com", "SephirWatcher"),
                 Subject = subject,
-                PlainTextContent = message,
                 HtmlContent = message
             };
             msg.AddTo(new EmailAddress(email));

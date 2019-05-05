@@ -38,6 +38,8 @@ namespace DaHo.SephirWatcher.Web
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
+            //services.AddLogging(builder => builder.AddConsole());
+
             services.AddDbContext<SephirContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -54,6 +56,13 @@ namespace DaHo.SephirWatcher.Web
             services.Configure<PasswordCipherOptions>(Configuration);
 
             services.AddDataProtection();
+
+            services.AddAuthentication()
+                .AddGoogle(googleOptions =>
+                    {
+                        googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                        googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

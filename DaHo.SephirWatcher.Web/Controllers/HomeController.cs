@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using DaHo.SephirWatcher.Models;
 using DaHo.SephirWatcher.Web.Data;
 using DaHo.SephirWatcher.Web.Interfaces;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DaHo.SephirWatcher.Web.Controllers
 {
@@ -34,6 +36,11 @@ namespace DaHo.SephirWatcher.Web.Controllers
             return View("AddSephirAccount");
         }
 
+        public IActionResult Overview()
+        {
+            return View("Overview");
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveSephirLogin(SephirLoginViewModel sephirLogin)
         {
@@ -42,29 +49,32 @@ namespace DaHo.SephirWatcher.Web.Controllers
 
             if (await _context.SephirLogins.AnyAsync(x => x.EmailAdress.Equals(sephirLogin.EmailAdress)))
             {
-                ModelState.AddModelError(string.Empty,  "A Sephir acount with this email-address was already saved");
+                ModelState.AddModelError(string.Empty,  "A Sephir account with this email-address was already saved");
                 return View("AddSephirAccount", sephirLogin);
             }
 
             if (!await ValidateSephirLogin(sephirLogin))
             {
-                ModelState.AddModelError(string.Empty, "The Sephir credentials are invalid (could not login in with them");
+                ModelState.AddModelError(string.Empty, "The Sephir credentials are invalid (could not login in with them)");
                 return View("AddSephirAccount", sephirLogin);
             }
 
-            await _context.SephirLogins.AddAsync(new SephirLogin
+            var login = new SephirLogin
             {
                 EmailAdress = sephirLogin.EmailAdress,
                 EncryptedPassword = _stringCipher.Encrypt(sephirLogin.Password),
                 IdentityUserId = _userManager.GetUserId(HttpContext.User)
-            });
+            };
+            await _context.SephirLogins.AddAsync(login);
 
             await _context.SaveChangesAsync();
 
-            return View("AddSephirAccount");
+            await GetAndSaveSephirTests(login);
+
+            return RedirectToAction("Overview");
         }
 
-        private async Task<bool> ValidateSephirLogin(SephirLoginViewModel login)
+        private static async Task<bool> ValidateSephirLogin(SephirLoginViewModel login)
         {
             var sephirWatcher = new SephirWatcher(new SephirAccount
             {
@@ -78,6 +88,32 @@ namespace DaHo.SephirWatcher.Web.Controllers
         {
             return await _context.SephirLogins.AnyAsync(x =>
                 x.IdentityUserId == _userManager.GetUserId(HttpContext.User));
+        }
+
+        private async Task GetAndSaveSephirTests(SephirLogin sephirLogin)
+        {
+            var sephirWatcher = new SephirWatcher(new SephirAccount
+            {
+                AccountEmail = sephirLogin.EmailAdress,
+                AccountPassword = _stringCipher.Decrypt(sephirLogin.EncryptedPassword)
+            });
+
+            var tests = (await sephirWatcher.GetSephirExamsForAllClasses())
+                .Where(x => x.Mark.HasValue)
+                .Select(x => new SephirTest
+                {
+                    ExamDate = x.ExamDate,
+                    ExamState = x.ExamState,
+                    ExamTitle = x.ExamTitle,
+                    Mark = x.Mark,
+                    MarkType = x.MarkType,
+                    MarkWeighting = x.MarkWeighting,
+                    SchoolSubject = x.SchoolSubject,
+                    SephirLoginId = sephirLogin.Id
+                });
+
+            await _context.SephirTests.AddRangeAsync(tests);
+            await _context.SaveChangesAsync();
         }
     }
 }
