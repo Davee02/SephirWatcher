@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -129,7 +130,7 @@ namespace DaHo.SephirWatcher
             {
                 yield return new SephirExam
                 {
-                    ExamDate = DateTime.Parse(row.Columns[0]),
+                    ExamDate = DateTime.Parse(row.Columns[0], new CultureInfo("de-ch")),
                     ExamState = row.Columns[3],
                     ExamTitle = row.Columns[2],
                     MarkType = row.Columns[4],
