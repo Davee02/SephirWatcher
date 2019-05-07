@@ -1,9 +1,18 @@
-﻿
+﻿@model OverviewViewModel
 @{
     ViewData["Title"] = "Overview";
 }
 
 <h1>SephirWatcher</h1>
 
-<p class="text-center">Your account settings are saved. The SephirWatcher will check every 10 minutes, if a new mark was published to your profile. If so, we will send you an email.</p>
-<a asp-controller="EditSephirAccount" asp-action="Index" class="btn-dark btn">Edit Sephir account</a>
+@if (Model.SephirAccountIsSaved)
+{
+    <p class="text-center">Your account settings are saved. The SephirWatcher will check every 10 minutes, if a new mark was published to your profile. If so, we will send you an email.</p>
+    <a asp-controller="SephirAccount" asp-action="Index" class="btn-dark btn">Edit Sephir account</a>
+}
+else
+{
+    <p class="text-center">Please add your Sephir-account credentials</p>
+    <a asp-controller="SephirAccount" asp-action="Index" class="btn-dark btn">Add Sephir account</a>
+
+}

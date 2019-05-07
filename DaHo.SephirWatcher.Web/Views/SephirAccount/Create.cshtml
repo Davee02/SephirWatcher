@@ -1,11 +1,15 @@
 ﻿@model SephirLoginViewModel
 @{
-    ViewData["Title"] = "Edit Sephir account";
+    ViewData["Title"] = "New Sephir account";
 }
 
+<div class="text-center">
+    <h1 class="display-4">Welcome to the Sephir-Watcher</h1>
+</div>
+<hr />
 
-<form asp-controller="EditSephirAccount" asp-action="SaveSephirLogin">
-    <h4>Edit your Sephir account</h4>
+<form asp-controller="SephirAccount" asp-action="CreateSephirLogin">
+    <h4>Add your Sephir account</h4>
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="EmailAdress" class="control-label"></label>
@@ -25,5 +29,5 @@
 
 @section Scripts
 {
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -14,5 +14,7 @@ namespace DaHo.SephirWatcher.Web.Models
         [DataType(DataType.Password)]
         [DisplayName("Password")]
         public string Password { get; set; }
+
+        public long Id { get; set; }
     }
 }
