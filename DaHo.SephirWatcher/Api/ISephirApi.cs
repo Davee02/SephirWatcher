@@ -49,7 +49,12 @@ namespace DaHo.SephirWatcher.Api
         Task<string> Marks([Query] string cfId, [Query] string cfToken, [Body(BodySerializationMethod.UrlEncoded)] IDictionary<string, string> requestInfo);
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cfId"></param>
+        /// <param name="cfToken"></param>
+        /// <returns></returns>
         [Get("40_berufsfachschule/noten.cfm")]
         Task<string> MarksOverview([Query] string cfId, [Query] string cfToken);
     }

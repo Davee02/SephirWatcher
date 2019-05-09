@@ -158,13 +158,15 @@ namespace DaHo.SephirWatcher.Web.Services
                 "Der SephirWatcher kann sich nicht mehr mit deinem Sephir-Account einloggen. Bitte passe deine Daten auf unserer Webseite an.");
         }
 
-        private static async Task<List<SephirTest>> GetSavedTestsForLogin(SephirLogin login, CancellationToken cancellationToken,
+        private async Task<List<SephirTest>> GetSavedTestsForLogin(SephirLogin login, CancellationToken cancellationToken,
             SephirContext context)
         {
             var existingTests = await context
                 .SephirTests
                 .Where(x => x.SephirLogin.Id == login.Id)
                 .ToListAsync(cancellationToken);
+            existingTests.ForEach(x => x.Mark = _stringCipher.Decrypt(x.EncryptedMark));
+
             return existingTests;
         }
 
@@ -175,9 +177,9 @@ namespace DaHo.SephirWatcher.Web.Services
                 .Select(x => new SephirTest
                 {
                     ExamDate = x.ExamDate,
-                    ExamState = x.ExamState,
                     ExamTitle = x.ExamTitle,
-                    Mark = x.Mark,
+                    EncryptedMark = _stringCipher.Encrypt(x.Mark.ToString()),
+                    Mark = x.Mark.ToString(),
                     MarkType = x.MarkType,
                     MarkWeighting = x.MarkWeighting,
                     SchoolSubject = x.SchoolSubject,

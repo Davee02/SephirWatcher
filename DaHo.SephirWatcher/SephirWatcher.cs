@@ -32,7 +32,7 @@ namespace DaHo.SephirWatcher
                 return true;
 
             var tokens = await GetTokensAsync();
-            var loginResult = await _api.Login(tokens.CfId, tokens.CfToken, SephirAccountToDictionary(_account));
+            var loginResult = await _api.Login(tokens.CfId, tokens.CfToken, CreateSephirAccountDictionary(_account));
 
             _isLoggedIn = true;
 
@@ -53,7 +53,7 @@ namespace DaHo.SephirWatcher
             var allExams = new List<SephirExam>();
             foreach (var schoolClass in classes)
             {
-                var marks = await _api.Marks(tokens.CfId, tokens.CfToken, GetDictionaryForMarks(schoolClass.ClassId));
+                var marks = await _api.Marks(tokens.CfId, tokens.CfToken, CreateRequestInfoDictionary(schoolClass.ClassId));
                 allExams.AddRange(GetSephirExamsFromExamPage(marks));
             }
 
@@ -88,7 +88,7 @@ namespace DaHo.SephirWatcher
 
         }
 
-        private static Dictionary<string, string> SephirAccountToDictionary(SephirAccount account)
+        private static Dictionary<string, string> CreateSephirAccountDictionary(SephirAccount account)
         {
             return new Dictionary<string, string>
             {
@@ -97,7 +97,7 @@ namespace DaHo.SephirWatcher
             };
         }
 
-        private static Dictionary<string, string> GetDictionaryForMarks(string klasseId)
+        private static Dictionary<string, string> CreateRequestInfoDictionary(string klasseId)
         {
             return new Dictionary<string, string>
             {
@@ -134,8 +134,8 @@ namespace DaHo.SephirWatcher
                     ExamState = row.Columns[3],
                     ExamTitle = row.Columns[2],
                     MarkType = row.Columns[4],
-                    MarkWeighting = row.Columns[5].ParseOrNull(),
-                    Mark = row.Columns[6].ParseOrNull(),
+                    MarkWeighting = row.Columns[5].ParseOrDefault(null),
+                    Mark = row.Columns[6].ParseOrDefault(null),
                     SchoolSubject = row.Columns[1]
                 };
             }

@@ -137,9 +137,8 @@ namespace DaHo.SephirWatcher.Web.Controllers
                 .Select(x => new SephirTest
                 {
                     ExamDate = x.ExamDate,
-                    ExamState = x.ExamState,
                     ExamTitle = x.ExamTitle,
-                    Mark = x.Mark,
+                    EncryptedMark = _stringCipher.Encrypt(x.Mark.ToString()),
                     MarkType = x.MarkType,
                     MarkWeighting = x.MarkWeighting,
                     SchoolSubject = x.SchoolSubject,

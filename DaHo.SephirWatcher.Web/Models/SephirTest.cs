@@ -21,16 +21,15 @@ namespace DaHo.SephirWatcher.Web.Models
         public string ExamTitle { get; set; }
 
         [Required]
-        public string ExamState { get; set; }
-
-        [Required]
         public string MarkType { get; set; }
 
         [Range(0, 100)]
         public double? MarkWeighting { get; set; }
 
-        [Range(0, 6)]
-        public double? Mark { get; set; }
+        public string EncryptedMark { get; set; }
+
+        [NotMapped]
+        public string Mark { get; set; }
 
         public SephirLogin SephirLogin { get; set; }
 

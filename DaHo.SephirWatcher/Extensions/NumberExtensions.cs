@@ -2,15 +2,11 @@
 {
     public static class NumberExtensions
     {
-        public static double? ParseOrNull(this string s)
+        public static double? ParseOrDefault(this string s, double? defaultValue = default)
         {
-            if (double.TryParse(s, out var result))
-            {
-                return result;
-            }
-
-            return null;
-
+            return double.TryParse(s, out var result) ? 
+                result : 
+                defaultValue;
         }
     }
 }

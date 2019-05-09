@@ -13,13 +13,11 @@ namespace DaHo.SephirWatcher.Web.Controllers
     public class HomeController : BaseController
     {
         private readonly SephirContext _context;
-        private readonly IStringCipher _stringCipher;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(SephirContext context, IStringCipher stringCipher, UserManager<IdentityUser> userManager)
+        public HomeController(SephirContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
-            _stringCipher = stringCipher;
             _userManager = userManager;
         }
 
