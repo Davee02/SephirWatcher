@@ -5,10 +5,13 @@
     <UserSecretsId>aspnet-DaHo.SephirWatcher.Web-14092F5E-1F92-49E1-8CEF-84AFEF182B71</UserSecretsId>
     <WebProject_DirectoryAccessLevelKey>0</WebProject_DirectoryAccessLevelKey>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <ApplicationInsightsResourceId>/subscriptions/7b8d079f-c466-42cf-8834-7bc7aede8407/resourcegroups/SephirWatcher/providers/microsoft.insights/components/SephirWatcher</ApplicationInsightsResourceId>
+    <ApplicationInsightsAnnotationResourceId>/subscriptions/7b8d079f-c466-42cf-8834-7bc7aede8407/resourcegroups/SephirWatcher/providers/microsoft.insights/components/SephirWatcher</ApplicationInsightsAnnotationResourceId>
   </PropertyGroup>
 
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
@@ -20,6 +23,11 @@
   <ItemGroup>
     <ProjectReference Include="..\DaHo.SephirWatcher.Utilities\DaHo.SephirWatcher.Utilities.csproj" />
     <ProjectReference Include="..\DaHo.SephirWatcher\DaHo.SephirWatcher.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
 </Project>
