@@ -35,5 +35,7 @@ namespace DaHo.SephirWatcher.Web.Models
 
         [Required]
         public long SephirLoginId { get; set; }
+
+        public override string ToString() => $"{SchoolSubject}: {ExamTitle}";
     }
 }

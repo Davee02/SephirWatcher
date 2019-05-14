@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DaHo.SephirWatcher.Models;
+using DaHo.SephirWatcher.Utilities;
 using DaHo.SephirWatcher.Web.Data;
 using DaHo.SephirWatcher.Web.Helper;
 using DaHo.SephirWatcher.Web.Interfaces;
 using DaHo.SephirWatcher.Web.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -148,8 +150,10 @@ namespace DaHo.SephirWatcher.Web.Services
             await context.SephirTests.AddRangeAsync(newTests, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
 
+            string emailText = $"Du hast in den folgenden Fächern eine neue Note im Sephir:<br>{HtmlUtilities.CreateUnorderedList(newTests)}";
+
             await _emailSender.SendEmailAsync(login.IdentityUser.Email, "Neue Note im Sephir",
-                "Du hast eine neue Note im Sephir!");
+                emailText);
         }
 
         private async Task HandleInvalidSephirCredentials(SephirLogin login)

@@ -18,6 +18,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\DaHo.SephirWatcher.Utilities\DaHo.SephirWatcher.Utilities.csproj" />
     <ProjectReference Include="..\DaHo.SephirWatcher\DaHo.SephirWatcher.csproj" />
   </ItemGroup>
 
