@@ -10,7 +10,6 @@ using DaHo.SephirWatcher.Web.Helper;
 using DaHo.SephirWatcher.Web.Interfaces;
 using DaHo.SephirWatcher.Web.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -54,13 +53,10 @@ namespace DaHo.SephirWatcher.Web.Services
                             .ToListAsync(stoppingToken);
                         _logger.LogInformation($"Watching {allSephirLogins.Count} sephir accounts");
 
-                        var tasks = new List<Task>();
                         foreach (var sephirLogin in allSephirLogins)
                         {
-                            tasks.Add(ExecuteActionAsync(sephirLogin, scope, stoppingToken));
+                            await ExecuteActionAsync(sephirLogin, scope, stoppingToken);
                         }
-
-                        Task.WaitAll(tasks.ToArray(), stoppingToken);
                     }
                 }
                 catch (Exception e)
