@@ -1,7 +1,0 @@
-{
-    "IsEncrypted": false,
-    "Values": {
-        "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=daviddiag928;AccountKey=/p0mcJ9DK6hnzxt8jxuXlWGMuTJd1OjTUWWY8UQxDz44rqBdwGLfspJ4Mg77g/y2ONRqIsZKAE7HN7xxbicE6Q==;BlobEndpoint=https://daviddiag928.blob.core.windows.net/;TableEndpoint=https://daviddiag928.table.core.windows.net/;QueueEndpoint=https://daviddiag928.queue.core.windows.net/;FileEndpoint=https://daviddiag928.file.core.windows.net/",
-        "FUNCTIONS_WORKER_RUNTIME": "dotnet"
-    }
-}
