@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaHo.SephirWatcher", "DaHo.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaHo.SephirWatcher.Web", "DaHo.SephirWatcher.Web\DaHo.SephirWatcher.Web.csproj", "{9B230C7A-AD89-4A61-A248-60469D1387D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaHo.SephirWatcher.Utilities", "DaHo.SephirWatcher.Utilities\DaHo.SephirWatcher.Utilities.csproj", "{6C0AC7B5-801E-45D9-9567-EF120CD24EB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaHo.SephirWatcher.Utilities", "DaHo.SephirWatcher.Utilities\DaHo.SephirWatcher.Utilities.csproj", "{6C0AC7B5-801E-45D9-9567-EF120CD24EB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaHo.SephirWatcher.Web.Pinger", "DaHo.SephirWatcher.Web.Pinger\DaHo.SephirWatcher.Web.Pinger.csproj", "{5C0CE5B1-B166-4A9E-819C-8546B669B87C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{6C0AC7B5-801E-45D9-9567-EF120CD24EB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C0AC7B5-801E-45D9-9567-EF120CD24EB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C0AC7B5-801E-45D9-9567-EF120CD24EB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C0CE5B1-B166-4A9E-819C-8546B669B87C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C0CE5B1-B166-4A9E-819C-8546B669B87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C0CE5B1-B166-4A9E-819C-8546B669B87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C0CE5B1-B166-4A9E-819C-8546B669B87C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
