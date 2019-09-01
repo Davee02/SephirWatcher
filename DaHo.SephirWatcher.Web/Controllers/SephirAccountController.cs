@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using DaHo.SephirWatcher.Models;
 using DaHo.SephirWatcher.Web.Data;
-using DaHo.SephirWatcher.Web.Interfaces;
 using DaHo.SephirWatcher.Web.Models;
+using DaHo.SephirWatcher.Web.Services.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

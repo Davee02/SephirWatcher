@@ -7,8 +7,8 @@ using DaHo.SephirWatcher.Models;
 using DaHo.SephirWatcher.Utilities;
 using DaHo.SephirWatcher.Web.Data;
 using DaHo.SephirWatcher.Web.Helper;
-using DaHo.SephirWatcher.Web.Interfaces;
 using DaHo.SephirWatcher.Web.Models;
+using DaHo.SephirWatcher.Web.Services.Abstraction;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,10 +65,9 @@ namespace DaHo.SephirWatcher.Web.Services
                 }
                 finally
                 {
-                    // Wait 10 minutes before running again.
-                    await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+                    // Wait 5 minutes before running again.
+                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
-
             }
         }
 

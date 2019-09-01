@@ -1,7 +1,7 @@
 ﻿using DaHo.SephirWatcher.Web.Configuration;
 using DaHo.SephirWatcher.Web.Data;
-using DaHo.SephirWatcher.Web.Interfaces;
 using DaHo.SephirWatcher.Web.Services;
+using DaHo.SephirWatcher.Web.Services.Abstraction;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -41,8 +41,6 @@ namespace DaHo.SephirWatcher.Web
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddRazorRuntimeCompilation();
 
-            //services.AddLogging(builder => builder.AddConsole());
-
             services.AddDbContext<SephirContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -73,7 +71,7 @@ namespace DaHo.SephirWatcher.Web
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+
             }
             else
             {
@@ -81,6 +79,7 @@ namespace DaHo.SephirWatcher.Web
                 app.UseHsts();
             }
 
+            app.UseDeveloperExceptionPage();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -93,6 +92,16 @@ namespace DaHo.SephirWatcher.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            InitializeDatabase(app);
+        }
+
+        private static void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<SephirContext>().Database.Migrate();
+            }
         }
     }
 }

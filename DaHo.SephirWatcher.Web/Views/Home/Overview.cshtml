@@ -7,7 +7,7 @@
 
 @if (Model.SephirAccountIsSaved)
 {
-    <p class="text-center">Your account settings are saved. The SephirWatcher will check every 10 minutes, if a new mark was published to your profile. If so, we will send you an email.</p>
+    <p class="text-center">Your account settings are saved. The SephirWatcher will check every 5 minutes, if a new mark was published to your profile. If so, we will send you an email.</p>
     <a asp-controller="SephirAccount" asp-action="Index" class="btn-dark btn">Edit Sephir account</a>
 }
 else

@@ -1,4 +1,4 @@
-﻿namespace DaHo.SephirWatcher.Web.Interfaces
+﻿namespace DaHo.SephirWatcher.Web.Services.Abstraction
 {
     public interface IStringCipher
     {

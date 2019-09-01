@@ -1,5 +1,5 @@
 ﻿using DaHo.SephirWatcher.Web.Configuration;
-using DaHo.SephirWatcher.Web.Interfaces;
+using DaHo.SephirWatcher.Web.Services.Abstraction;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 
