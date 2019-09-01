@@ -37,7 +37,9 @@ namespace DaHo.SephirWatcher.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc(options => options.EnableEndpointRouting = false)
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddRazorRuntimeCompilation();
 
             //services.AddLogging(builder => builder.AddConsole());
 
@@ -50,7 +52,7 @@ namespace DaHo.SephirWatcher.Web
             services.AddSingleton<IHostedService, SephirMarkWatcherService>();
 
             services.AddDefaultIdentity<IdentityUser>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
+                .AddDefaultUI()
                 .AddEntityFrameworkStores<SephirContext>();
 
             services.Configure<EmailSenderOptions>(Configuration);
@@ -67,7 +69,7 @@ namespace DaHo.SephirWatcher.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -76,7 +78,6 @@ namespace DaHo.SephirWatcher.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
