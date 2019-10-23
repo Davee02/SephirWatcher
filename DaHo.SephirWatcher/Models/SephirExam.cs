@@ -17,5 +17,7 @@ namespace DaHo.SephirWatcher.Models
         public double? MarkWeighting { get; set; }
 
         public double? Mark { get; set; }
+
+        public string ExamId { get; set; }
     }
 }

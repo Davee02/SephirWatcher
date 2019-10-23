@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using DaHo.SephirWatcher.Extensions;
@@ -116,29 +117,45 @@ namespace DaHo.SephirWatcher
                 .QuerySelectorAll("table.listtab_rot > tr:not(:first-child)")
                 .Select(x => new
                 {
-                    Columns = x
+                    ColumnTexts = x
                         .ChildNodes
                         .Where(y => y.Name.Equals("td"))
                         .Select(y => HttpUtility.HtmlDecode(y.InnerText)?.Trim())
+                        .ToList(),
+                    ColumnChildNodes = x
+                        .ChildNodes
+                        .Where(y => y.Name.Equals("td"))
                         .ToList()
-
-                })
-                .ToList();
+                });
 
 
             foreach (var row in tableRows)
             {
                 yield return new SephirExam
                 {
-                    ExamDate = DateTime.Parse(row.Columns[0], new CultureInfo("de-ch")),
-                    ExamState = row.Columns[3],
-                    ExamTitle = row.Columns[2],
-                    MarkType = row.Columns[4],
-                    MarkWeighting = row.Columns[5].ParseOrDefault(null),
-                    Mark = row.Columns[6].ParseOrDefault(null),
-                    SchoolSubject = row.Columns[1]
+                    ExamDate = DateTime.Parse(row.ColumnTexts[0], new CultureInfo("de-ch")),
+                    SchoolSubject = row.ColumnTexts[1],
+                    ExamTitle = row.ColumnTexts[2],
+                    ExamState = row.ColumnTexts[3],
+                    MarkType = row.ColumnTexts[4],
+                    MarkWeighting = row.ColumnTexts[5].ParseOrDefault(null),
+                    Mark = row.ColumnTexts[6].ParseOrDefault(null),
+                    ExamId = GetExamIdFromSephirColumn(row.ColumnChildNodes[7])
                 };
             }
+        }
+
+        private static string GetExamIdFromSephirColumn(HtmlNode nodes)
+        {
+            var hrefValue = nodes
+                .ChildNodes
+                .FirstOrDefault(x => x.Name.Equals("a"))
+                ?.GetAttributeValue("href", string.Empty);
+
+            return Regex.Match(hrefValue ?? string.Empty, 
+                @"javascript:pf_pruefungprint\((.*)\);")
+                .Groups[1]
+                .Value;
         }
 
         private static bool WasLoginSuccessful(string loginPage)

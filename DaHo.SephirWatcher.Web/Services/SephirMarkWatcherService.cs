@@ -17,17 +17,18 @@ using Microsoft.Extensions.Logging;
 
 namespace DaHo.SephirWatcher.Web.Services
 {
-    public class SephirMarkWatcherService : IHostedService, IDisposable
+    public class SephirMarkWatcherService : BackgroundService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<SephirMarkWatcherService> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IStringCipher _stringCipher;
-        private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
 
-        private Task _executingTask;
-
-        public SephirMarkWatcherService(IServiceScopeFactory serviceScopeFactory, ILogger<SephirMarkWatcherService> logger, IEmailSender emailSender, IStringCipher stringCipher)
+        public SephirMarkWatcherService(
+            IServiceScopeFactory serviceScopeFactory, 
+            ILogger<SephirMarkWatcherService> logger, 
+            IEmailSender emailSender, 
+            IStringCipher stringCipher)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
@@ -35,7 +36,7 @@ namespace DaHo.SephirWatcher.Web.Services
             _stringCipher = stringCipher;
         }
 
-        protected async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // This will cause the loop to stop if the service is stopped
             while (!stoppingToken.IsCancellationRequested)
@@ -65,52 +66,10 @@ namespace DaHo.SephirWatcher.Web.Services
                 }
                 finally
                 {
-                    // Wait 5 minutes before running again.
-                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+                    // Wait 2 minutes before running again.
+                    await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
                 }
             }
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            // Store the task we're executing
-            _executingTask = ExecuteAsync(_stoppingCts.Token);
-
-            // If the task is completed then return it,
-            // this will bubble cancellation and failure to the caller
-            if (_executingTask.IsCompleted)
-            {
-                return _executingTask;
-            }
-
-            // Otherwise it's running
-            return Task.CompletedTask;
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            // Stop called without start
-            if (_executingTask == null)
-            {
-                return;
-            }
-
-            try
-            {
-                // Signal cancellation to the executing method
-                _stoppingCts.Cancel();
-            }
-            finally
-            {
-                // Wait until the task completes or the stop token triggers
-                await Task.WhenAny(_executingTask, Task.Delay(Timeout.Infinite,
-                    cancellationToken));
-            }
-        }
-
-        public void Dispose()
-        {
-            _stoppingCts.Cancel();
         }
 
         private async Task ExecuteActionAsync(SephirLogin login, IServiceScope scope, CancellationToken cancellationToken)
