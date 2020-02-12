@@ -24,7 +24,7 @@ namespace DaHo.SephirWatcher
         public SephirWatcher(SephirAccount account)
         {
             _account = account;
-            _api = RestClient.For<ISephirApi>("https://sephir.ch/ICT/user/lernendenportal");
+            _api = RestClient.For<ISephirApi>("https://sephir.ch");
         }
 
         public async Task<bool> AreCredentialsValid()
@@ -72,7 +72,7 @@ namespace DaHo.SephirWatcher
             return _tokens;
         }
 
-        
+
         private static CfAuthentification GetCfAuthentificationFromIndexPage(string indexPage)
         {
             var doc = new HtmlDocument();
@@ -86,7 +86,6 @@ namespace DaHo.SephirWatcher
                 CfId = actionParameters.Get("cfid"),
                 CfToken = actionParameters.Get("cftoken")
             };
-
         }
 
         private static Dictionary<string, string> CreateSephirAccountDictionary(SephirAccount account)
@@ -131,6 +130,11 @@ namespace DaHo.SephirWatcher
 
             foreach (var row in tableRows)
             {
+                if (row.ColumnTexts.Count < 2)
+                    continue;
+
+                var examId = GetExamIdFromSephirColumn(row.ColumnChildNodes[7]);
+
                 yield return new SephirExam
                 {
                     ExamDate = DateTime.Parse(row.ColumnTexts[0], new CultureInfo("de-ch")),
@@ -140,7 +144,7 @@ namespace DaHo.SephirWatcher
                     MarkType = row.ColumnTexts[4],
                     MarkWeighting = row.ColumnTexts[5].ParseOrDefault(null),
                     Mark = row.ColumnTexts[6].ParseOrDefault(null),
-                    ExamId = GetExamIdFromSephirColumn(row.ColumnChildNodes[7])
+                    MarksChartImage = GetExamMarksImageBytes(examId)
                 };
             }
         }
@@ -152,7 +156,7 @@ namespace DaHo.SephirWatcher
                 .FirstOrDefault(x => x.Name.Equals("a"))
                 ?.GetAttributeValue("href", string.Empty);
 
-            return Regex.Match(hrefValue ?? string.Empty, 
+            return Regex.Match(hrefValue ?? string.Empty,
                 @"javascript:pf_pruefungprint\((.*)\);")
                 .Groups[1]
                 .Value;
@@ -178,6 +182,11 @@ namespace DaHo.SephirWatcher
                     ClassName = classOption.InnerText
                 };
             }
+        }
+
+        private static byte[] GetExamMarksImageBytes(string examId)
+        {
+            return Enumerable.Empty<byte>().ToArray();
         }
     }
 }

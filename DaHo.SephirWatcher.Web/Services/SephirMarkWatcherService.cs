@@ -25,9 +25,9 @@ namespace DaHo.SephirWatcher.Web.Services
         private readonly IStringCipher _stringCipher;
 
         public SephirMarkWatcherService(
-            IServiceScopeFactory serviceScopeFactory, 
-            ILogger<SephirMarkWatcherService> logger, 
-            IEmailSender emailSender, 
+            IServiceScopeFactory serviceScopeFactory,
+            ILogger<SephirMarkWatcherService> logger,
+            IEmailSender emailSender,
             IStringCipher stringCipher)
         {
             _serviceScopeFactory = serviceScopeFactory;

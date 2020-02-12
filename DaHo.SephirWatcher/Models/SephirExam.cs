@@ -18,6 +18,6 @@ namespace DaHo.SephirWatcher.Models
 
         public double? Mark { get; set; }
 
-        public string ExamId { get; set; }
+        public byte[] MarksChartImage{ get; set; }
     }
 }

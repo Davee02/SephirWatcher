@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using DaHo.Library.AspNetCore;
 
 namespace DaHo.SephirWatcher.Web
 {
@@ -55,22 +56,18 @@ namespace DaHo.SephirWatcher.Web
 
             services.AddDataProtection();
 
-            //services.AddAuthentication()
-            //    .AddGoogle(googleOptions =>
-            //        {
-            //            googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-            //            googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-            //        });
+            services.AddAuthentication()
+                .AddGoogle(googleOptions =>
+                    {
+                        googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+                        googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-
-            }
-            else
+            if (!env.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
@@ -90,15 +87,7 @@ namespace DaHo.SephirWatcher.Web
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            InitializeDatabase(app);
-        }
-
-        private static void InitializeDatabase(IApplicationBuilder app)
-        {
-            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
-                scope.ServiceProvider.GetRequiredService<SephirContext>().Database.Migrate();
-            }
+            app.MigrateDatabase<SephirContext>();
         }
     }
 }

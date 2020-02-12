@@ -30,8 +30,8 @@ namespace DaHo.SephirWatcher.Web.Helper
                 hashCode = (hashCode * 397) ^ (obj.MarkType != null ? obj.MarkType.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ obj.MarkWeighting.GetHashCode();
                 hashCode = (hashCode * 397) ^ (obj.Mark != null ? obj.Mark.GetHashCode() : 0);
-                return hashCode;
 
+                return hashCode;
             }
         }
     }

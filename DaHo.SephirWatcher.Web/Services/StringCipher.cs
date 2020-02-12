@@ -17,7 +17,6 @@ namespace DaHo.SephirWatcher.Web.Services
 
         public PasswordCipherOptions Options { get; } //set only via Secret Manager
 
-
         public string Encrypt(string text)
         {
             if (string.IsNullOrEmpty(text))

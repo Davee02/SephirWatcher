@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using RestEase;
 
@@ -14,7 +15,7 @@ namespace DaHo.SephirWatcher.Api
         /// Makes a GET request to the login page of sephir
         /// </summary>
         /// <returns>The html code of the login-page</returns>
-        [Get("login.cfm")]
+        [Get("ICT/user/lernendenportal/login.cfm")]
         Task<string> Index();
 
 
@@ -31,7 +32,7 @@ namespace DaHo.SephirWatcher.Api
         /// If the login was successful: one line of javascript <para/>
         /// If the login was not successful: a html page which contains the message "Anmeldung nicht erfolgreich"
         /// </returns>
-        [Post("login_action.cfm")]
+        [Post("ICT/user/lernendenportal/login_action.cfm")]
         Task<string> Login([Query] string cfId, [Query] string cfToken, [Body(BodySerializationMethod.UrlEncoded)] IDictionary<string, string> accountInfo);
 
 
@@ -45,17 +46,37 @@ namespace DaHo.SephirWatcher.Api
         /// The 3 keys must be 'seltyp' (default value "klasse"), 'klassefachId' (default value "all") and 'klasseId'.
         /// </param>
         /// <returns>The html code of the marks-page in sephir</returns>
-        [Post("40_berufsfachschule/noten.cfm?nogroup=pruef")]
+        [Post("ICT/user/lernendenportal/40_berufsfachschule/noten.cfm?nogroup=pruef")]
         Task<string> Marks([Query] string cfId, [Query] string cfToken, [Body(BodySerializationMethod.UrlEncoded)] IDictionary<string, string> requestInfo);
 
 
         /// <summary>
-        /// 
+        /// Makes a GET request to the page with all marks from the current semester
         /// </summary>
-        /// <param name="cfId"></param>
-        /// <param name="cfToken"></param>
-        /// <returns></returns>
-        [Get("40_berufsfachschule/noten.cfm")]
+        /// <param name="cfId">The session-id</param>
+        /// <param name="cfToken">The session-token</param>
+        /// <returns>The html code of the marks-page in sephir</returns>
+        [Get("ICT/user/lernendenportal/40_berufsfachschule/noten.cfm")]
         Task<string> MarksOverview([Query] string cfId, [Query] string cfToken);
+
+
+        /// <summary>
+        /// Makes a GET request to the exam evaluation page
+        /// </summary>
+        /// <param name="cfId">The session-id</param>
+        /// <param name="cfToken">The session-token</param>
+        /// <param name="pruefungID">The id of the exam</param>
+        /// <returns>The html code of the exam evaluation page in sephir</returns>
+        [Get("ICT/user/lernendenportal/40_berufsfachschule/noten.cfm?act=pdet")]
+        Task<string> ExamEvaluation([Query] string cfId, [Query] string cfToken, [Query] string pruefungID);
+
+
+        /// <summary>
+        /// Downloads the exam marks image
+        /// </summary>
+        /// <param name="imageName">The name of the image</param>
+        /// <returns>The stream containing the image</returns>
+        [Get("CFFileServlet/_cf_chart/{imageName}")]
+        Task<Stream> ExamMarksChart([Path] string imageName);
     }
 }

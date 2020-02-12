@@ -16,9 +16,9 @@ namespace DaHo.SephirWatcher.Web.Services
 
         public EmailSenderOptions Options { get; } //set only via Secret Manager
 
-        public Task SendEmailAsync(string email, string subject, string message)
+        public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            return Execute(Options.SendGridApiKey, subject, message, email);
+            return Execute(Options.SendGridApiKey, subject, htmlMessage, email);
         }
 
         public Task Execute(string apiKey, string subject, string message, string email)
